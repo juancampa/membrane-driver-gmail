@@ -92,7 +92,7 @@ schema.type('LabelCollection')
     .param('id', 'String', 'The id of the label')
   .computed('withName', 'Label*', 'A label with the provided name')
     .param('name', 'String', 'The name of the label')
-  .computed('all', '[Label]', 'All the labels')
+  .computed('items', '[Label]', 'All the labels')
 
 schema.type('Label')
   .field('id', 'String', 'The immutable ID of the label')

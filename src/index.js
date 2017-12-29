@@ -58,14 +58,15 @@ const TOPIC = 'gmail-driver-webhooks';
 //   });
 // });
 
-export async function init({ context }) {
-  await root.threads.set(context, { page: {} });
-  await root.messages.set(context, { page: {} });
-  // TODO: "page" instead of "all"
-  await root.labels.set(context, { all: {} });
+export async function init() {
+  await root.set({
+    threads: {},
+    messages: {},
+    labels: {},
+  });
 
   try {
-    await pubsub.createTopic(context, { name: TOPIC });
+    await pubsub.createTopic({ name: TOPIC });
     // TODO: use the IAM API to allow gmail to post to this topic
 
   } catch (err) {
@@ -76,13 +77,13 @@ export async function init({ context }) {
     }
   }
 
-  await pubsub.topic({name: 'gmail-driver-webhooks'}).messageReceived.subscribe(context, 'onWebhook');
+  await pubsub.topic({name: 'gmail-driver-webhooks'}).messageReceived.subscribe('onWebhook');
 
   // The oauth state field is used to retrieve this same account when the user
   // accepts the consent screen and it gets redirected to our redirect endpoint
   const authState = randomBytes(32).toString('hex');
   program.state.authState = authState;
-  await program.save(context);
+  await program.save();
 
   // generate the url the user can use to authorize our client
   const url = auth.generateAuthUrl({
@@ -94,15 +95,15 @@ export async function init({ context }) {
     ]
   });
 
-  context.log('Please go to:', url);
+  console.log('Please go to:', url);
 }
 
-export async function update({ previousVersion, context }) {
-  context.log('updating Gmail Driver from previous version: ', previousVersion);
+export async function update({ previousVersion }) {
+  console.log('updating Gmail Driver from previous version: ', previousVersion);
 }
 
-export function parse({ context, name, value }) {
-  context.log('Parsing', name, value);
+export function parse({ name, value }) {
+  console.log('Parsing', name, value);
   switch (name) {
     case 'url': {
       const { hash } = parseUrl(value, true);
@@ -128,7 +129,7 @@ export function parse({ context, name, value }) {
   }
 }
 
-export async function onWebhook({ context, sender, args }) {
+export async function onWebhook({ sender, args }) {
   const data = new Buffer(args.data, 'base64').toString();
   const { emailAddress, historyId: newHistoryId } = JSON.parse(data);
 
@@ -162,7 +163,7 @@ export async function onWebhook({ context, sender, args }) {
     //       if (observedLabels.indexOf(labelId) >= 0) {
     //         root.labels.one({ id: labelId })
     //           .messageAdded
-    //           .dispatch(context, {
+    //           .dispatch({
     //             message: root.messages.one({ id })
     //           });
     //       }
@@ -177,7 +178,7 @@ export async function onWebhook({ context, sender, args }) {
           if (observedLabels.indexOf(labelId) >= 0) {
             root.labels.one({ id: labelId })
               .messageAdded
-              .dispatch(context, {
+              .dispatch({
                 message: root.messages.one({ id: message.id })
               });
           }
@@ -190,7 +191,7 @@ export async function onWebhook({ context, sender, args }) {
     //     const labelIds = labelAdded.labelIds;
     //     if (labelIds && labelIds.indexOf('STARRED') >= 0) {
     //       const { id } = labelAdded.message;
-    //       root.messages.messageStarred.dispatch(context, { message: root.messages.one({ id }) });
+    //       root.messages.messageStarred.dispatch({ message: root.messages.one({ id }) });
     //     }
     //   }
     // }
@@ -198,10 +199,10 @@ export async function onWebhook({ context, sender, args }) {
 
   // Save this history id for next time
   program.state.historyId = newHistoryId;
-  await program.save(context);
+  await program.save();
 }
 
-export async function endpoint({ name, req, context}) {
+export async function endpoint({ name, req }) {
   switch (name) {
     case 'redirect': {
       const { code, state: authState } = parseQuery(parseUrl(req.url).query);
@@ -225,7 +226,7 @@ export async function endpoint({ name, req, context}) {
       });
 
       Object.assign(program.state, { token, historyId: response.historyId });
-      await program.save(context);
+      await program.save();
     }
   }
 }
@@ -234,7 +235,7 @@ export let Root = {
 }
 
 export let MessageCollection = {
-  one({ args, context }) {
+  one({ args }) {
     auth.credentials = program.state.token;
     return getMessage({ userId: 'me', auth, id: args.id });
 
@@ -242,7 +243,7 @@ export let MessageCollection = {
     // return messageLoader.load(args.id);
   },
 
-  async page({ args, context }) {
+  async page({ args }) {
     const options = {
       userId: 'me',
       auth,
@@ -305,7 +306,7 @@ export let Message = {
     return root.messages.one({ id })
   },
 
-  text({ self, context, source }) {
+  text({ self, source }) {
     let result = '';
     const stack = [source.payload];
     while (stack.length > 0) {
@@ -330,7 +331,7 @@ export let Message = {
 };
 
 export let HeaderCollection = {
-  one({ context, source, args }) {
+  one({ source, args }) {
     // Header name is case-insensitive
     const name = args.name.toUpperCase();
     return source.find((header) => header && header.name && header.name.toUpperCase() === name);
@@ -344,14 +345,13 @@ export let HeaderCollection = {
 
 export let Header = {
   // TODO: see description of the problem in info.js file.
-  self({ context, source, self, parent }) {
-    context.log('GETTING SELF', self, parent);
+  self({ source, self, parent }) {
     return self || parent.pop().push('one', { name: source.name });
   },
 };
 
 export let ThreadCollection = {
-  async one({ args, context }) {
+  async one({ args }) {
     auth.credentials = program.state.token;
     const thread = await getThread({ userId: 'me', auth, id: args.id })
 
@@ -362,7 +362,7 @@ export let ThreadCollection = {
     return thread;
   },
 
-  async page({ args, context }) {
+  async page({ args }) {
     const options = {
       userId: 'me',
       auth,
@@ -420,14 +420,14 @@ export let Thread = {
 };
 
 export let LabelCollection = {
-  one({ args, context }) {
+  one({ args }) {
     auth.credentials = program.state.token;
     return getLabel({ userId: 'me', auth, id: args.id });
   },
 
-  async withName({ args, context }) {
+  async withName({ args }) {
     auth.credentials = program.state.token;
-    const labels = await root.labels.all().query(context, '{ id name }');
+    const labels = await root.labels.items().query('{ id name }');
     const label = labels.find((l) => l.name === args.name);
     if (!label || !label.id) {
       return null;
@@ -436,7 +436,7 @@ export let LabelCollection = {
     // return getLabel({ userId: 'me', auth, id: label.id });
   },
 
-  async all({ context }) {
+  async items() {
     const options = {
       userId: 'me',
       auth,
@@ -449,30 +449,30 @@ export let LabelCollection = {
 
 export let Label = {
   messageAdded: {
-    subscribe: async ({ context, self }) => {
+    subscribe: async ({ self }) => {
       let { id } = self.match(root.labels.one());
       if (id === undefined) {
-        id = await self.id.get(context);
+        id = await self.id.get();
       }
       const { state } = program;
       const observedLabels = state.observedLabels = state.observedLabels || [];
       observedLabels.push(id);
-      await program.save(context);
+      await program.save();
 
-      context.log('SUBSCRIBED TO LABEL', id);
+      console.log('SUBSCRIBED TO LABEL', id);
     },
-    unsubscribe: async ({ context, self }) => {
+    unsubscribe: async ({ self }) => {
       let { id } = self.match(root.labels.one());
       if (id === undefined) {
-        id = await self.id.get(context);
+        id = await self.id.get();
       }
       const { state } = program;
       const index = state.observedLabels.indexOf(id);
       if (index >= 0) {
         state.observedLabels.splice(index, 1);
       }
-      await program.save(context);
-      context.log('UNSUBSCRIBED TO LABEL', id);
+      await program.save();
+      console.log('UNSUBSCRIBED TO LABEL', id);
     }
   }
 };
