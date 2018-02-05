@@ -10,23 +10,23 @@ const { root } = program.refs;
 import DataLoader from 'dataloader';
 
 // Simplify these resolvers once the sdk add support for promises
-const getToken = promisify(auth.getToken, auth);
-const getProfile = promisify(gmail.users.getProfile, gmail.users);
-const watch = promisify(gmail.users.watch, gmail.users);
-const stop = promisify(gmail.users.stop, gmail.users);
-const listHistory = promisify(gmail.users.history.list, gmail.users.history);
+const getToken = promisify(auth.getToken.bind(auth));
+const getProfile = promisify(gmail.users.getProfile.bind(gmail.users));
+const watch = promisify(gmail.users.watch.bind(gmail.users));
+const stop = promisify(gmail.users.stop.bind(gmail.users));
+const listHistory = promisify(gmail.users.history.list.bind(gmail.users.history));
 
 const messages = gmail.users.messages;
-const getMessage = promisify(messages.get, messages);
-const listMessage = promisify(messages.list, messages);
+const getMessage = promisify(messages.get.bind(messages));
+const listMessage = promisify(messages.list.bind(messages));
 
 const threads = gmail.users.threads;
-const getThread = promisify(threads.get, threads);
-const listThread = promisify(threads.list, threads);
+const getThread = promisify(threads.get.bind(threads));
+const listThread = promisify(threads.list.bind(threads));
 
 const labels = gmail.users.labels;
-const getLabel = promisify(labels.get, labels);
-const listLabel = promisify(labels.list, labels);
+const getLabel = promisify(labels.get.bind(labels));
+const listLabel = promisify(labels.list.bind(labels));
 
 const TOPIC = 'gmail-driver-webhooks';
 
