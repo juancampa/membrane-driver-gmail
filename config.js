@@ -1,7 +1,5 @@
 const { dependencies, endpoints, environment, imports, schema, expressions } = program;
 
-program.name = 'gmail';
-
 // Environment
 environment
   .add('CLIENT_ID', 'The API clientID')

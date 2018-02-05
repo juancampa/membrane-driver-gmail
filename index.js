@@ -3,7 +3,8 @@ import { randomBytes } from 'crypto';
 import { promisify } from 'util';
 import { parse as parseQuery } from 'querystring';
 import { parse as parseUrl } from 'url';
-import { root, pubsub } from './schema';
+
+const { root, pubsub } = program.refs;
 
 // import Batchelor from 'batchelor';
 import DataLoader from 'dataloader';

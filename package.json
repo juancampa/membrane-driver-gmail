@@ -1,0 +1,14 @@
+{
+  "name": "membrane-driver-gmail",
+  "version": "0.0.1",
+  "description": "Gmail driver for Membrane",
+  "repository": "git@github.com:juancampa/membrane-driver-gmail.git",
+  "author": "Juan Campa <juancampa@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "dataloader": "^1.3.0",
+    "google-auth-library": "^1.1.0",
+    "googleapis": "^25.0.0"
+  }
+}
