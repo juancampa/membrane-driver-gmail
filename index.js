@@ -4,7 +4,7 @@ import { promisify } from 'util';
 import { parse as parseQuery } from 'querystring';
 import { parse as parseUrl } from 'url';
 
-const { root, pubsub } = program.refs;
+const { root } = program.refs;
 
 // import Batchelor from 'batchelor';
 import DataLoader from 'dataloader';
@@ -66,19 +66,20 @@ export async function init() {
     labels: {},
   });
 
-  try {
-    await pubsub.createTopic({ name: TOPIC });
-    // TODO: use the IAM API to allow gmail to post to this topic
-
-  } catch (err) {
-    // google-cloud errors have a status field that is more reliable than
-    // checking the message but it doesn't go through our message queue
-    if (!err.toString().indexOf('already exists')) {
-      throw err;
-    }
-  }
-
-  await pubsub.topic({name: 'gmail-driver-webhooks'}).messageReceived.subscribe('onWebhook');
+  // TODO: Commenting this out until we can webpack the pubsub program correctly
+  // try {
+  //   await pubsub.createTopic({ name: TOPIC });
+  //   // TODO: use the IAM API to allow gmail to post to this topic
+  //
+  // } catch (err) {
+  //   // google-cloud errors have a status field that is more reliable than
+  //   // checking the message but it doesn't go through our message queue
+  //   if (!err.toString().indexOf('already exists')) {
+  //     throw err;
+  //   }
+  // }
+  //
+  // await pubsub.topic({name: 'gmail-driver-webhooks'}).messageReceived.subscribe('onWebhook');
 
   // The oauth state field is used to retrieve this same account when the user
   // accepts the consent screen and it gets redirected to our redirect endpoint

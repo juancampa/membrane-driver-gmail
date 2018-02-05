@@ -6,12 +6,12 @@ environment
   .add('CLIENT_SECRET', 'The API client secret')
 
 // Imports
-imports
-  .add('googlepubsub')
+// imports
+//   .add('googlepubsub')
 
 // Dependencies
-dependencies
-  .add('pubsub', 'googlepubsub:Root', 'The Google Pub Sub root type. Used to listen for changes')
+// dependencies
+//   .add('pubsub', 'googlepubsub:Root', 'The Google Pub Sub root type. Used to listen for changes')
 
 // Endpoints
 endpoints
