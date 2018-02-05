@@ -8,9 +8,8 @@ if (!redirectUrl) {
   throw new Error('Failed to determine redirect URL');
 }
 
-const AuthLib = require('google-auth-library');
-const googleAuth = new AuthLib();
-export const auth = new googleAuth.OAuth2(CLIENT_ID, CLIENT_SECRET, redirectUrl);
+const { OAuth2Client } = require('google-auth-library');
+export const auth = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, redirectUrl);
 
 const Api = require('googleapis/build/src/apis/gmail/v1');
 const api = new Api({});
