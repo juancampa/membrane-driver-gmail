@@ -98,6 +98,7 @@ export async function init() {
   });
 
   console.log('Please go to:', url);
+  console.log('Redirect URL:', program.endpoints.redirect.url);
 }
 
 export async function update({ previousVersion }) {
