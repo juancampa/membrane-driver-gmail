@@ -1,11 +1,11 @@
 import { gmail, auth } from './client.js';
 import { randomBytes } from 'crypto';
-import promisify from 'es6-promisify';
+import { promisify } from 'util';
 import { parse as parseQuery } from 'querystring';
 import { parse as parseUrl } from 'url';
 import { root, pubsub } from './schema';
 
-import Batchelor from 'batchelor';
+// import Batchelor from 'batchelor';
 import DataLoader from 'dataloader';
 
 // Simplify these resolvers once the sdk add support for promises
