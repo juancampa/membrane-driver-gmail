@@ -10,23 +10,23 @@ const { root } = program.refs;
 import DataLoader from 'dataloader';
 
 // Simplify these resolvers once the sdk add support for promises
-const getToken = promisify(auth.getToken.bind(auth)).then(({ data }) => data);
-const getProfile = promisify(gmail.users.getProfile.bind(gmail.users)).then(({ data }) => data);
-const watch = promisify(gmail.users.watch.bind(gmail.users)).then(({ data }) => data);
-const stop = promisify(gmail.users.stop.bind(gmail.users)).then(({ data }) => data);
-const listHistory = promisify(gmail.users.history.list.bind(gmail.users.history)).then(({ data }) => data);
+const getToken = promisify(auth.getToken.bind(auth));
+const getProfile = promisify(gmail.users.getProfile.bind(gmail.users));
+const watch = promisify(gmail.users.watch.bind(gmail.users));
+const stop = promisify(gmail.users.stop.bind(gmail.users));
+const listHistory = promisify(gmail.users.history.list.bind(gmail.users.history));
 
 const messages = gmail.users.messages;
-const getMessage = promisify(messages.get.bind(messages)).then(({ data }) => data);
-const listMessage = promisify(messages.list.bind(messages)).then(({ data }) => data);
+const getMessage = promisify(messages.get.bind(messages));
+const listMessage = promisify(messages.list.bind(messages));
 
 const threads = gmail.users.threads;
-const getThread = promisify(threads.get.bind(threads)).then(({ data }) => data);
-const listThread = promisify(threads.list.bind(threads)).then(({ data }) => data);
+const getThread = promisify(threads.get.bind(threads));
+const listThread = promisify(threads.list.bind(threads));
 
 const labels = gmail.users.labels;
-const getLabel = promisify(labels.get.bind(labels)).then(({ data }) => data);
-const listLabel = promisify(labels.list.bind(labels)).then(({ data }) => data);
+const getLabel = promisify(labels.get.bind(labels));
+const listLabel = promisify(labels.list.bind(labels));
 
 const TOPIC = 'gmail-driver-webhooks';
 
@@ -116,78 +116,78 @@ export function parse({ name, value }) {
   }
 }
 
-export async function onWebhook({ sender, args }) {
-  const data = new Buffer(args.data, 'base64').toString();
-  const { emailAddress, historyId: newHistoryId } = JSON.parse(data);
-
-  const { state } = program;
-  const { token, historyId } = state;
-
-  // TODO: IMPORTANT shouldn't we need to create a new auth object everytime?
-  auth.credentials = token;
-
-  // Get everything that happened to the user's mailbox after we last checked
-  const response = await listHistory({
-    userId: emailAddress,
-    auth,
-    startHistoryId: historyId || newHistoryId
-  });
-
-  if (!response.history) {
-    return;
-  }
-
-  const { observedLabels } = program.state;
-
-  // Dispatch events
-  for (let item of response.history) {
-    const { labelsAdded, messagesAdded } = item;
-
-    // if (messagesAdded) {
-    //   for (let messageAdded of messagesAdded) {
-    //     const { labelIds, id } = messageAdded.message;
-    //     for (let labelId of labelIds) {
-    //       if (observedLabels.indexOf(labelId) >= 0) {
-    //         root.labels.one({ id: labelId })
-    //           .messageAdded
-    //           .dispatch({
-    //             message: root.messages.one({ id })
-    //           });
-    //       }
-    //     }
-    //   }
-    // }
-
-    if (labelsAdded) {
-      for (let labelAdded of labelsAdded) {
-        const { labelIds, message } = labelAdded;
-        for (let labelId of labelIds) {
-          if (observedLabels.indexOf(labelId) >= 0) {
-            root.labels.one({ id: labelId })
-              .messageAdded
-              .dispatch({
-                message: root.messages.one({ id: message.id })
-              });
-          }
-        }
-      }
-    }
-
-    // if (labelsAdded) {
-    //   for (let labelAdded of labelsAdded) {
-    //     const labelIds = labelAdded.labelIds;
-    //     if (labelIds && labelIds.indexOf('STARRED') >= 0) {
-    //       const { id } = labelAdded.message;
-    //       root.messages.messageStarred.dispatch({ message: root.messages.one({ id }) });
-    //     }
-    //   }
-    // }
-  }
-
-  // Save this history id for next time
-  program.state.historyId = newHistoryId;
-  await program.save();
-}
+// export async function onWebhook({ sender, args }) {
+//   const data = new Buffer(args.data, 'base64').toString();
+//   const { emailAddress, historyId: newHistoryId } = JSON.parse(data);
+//
+//   const { state } = program;
+//   const { token, historyId } = state;
+//
+//   // TODO: IMPORTANT shouldn't we need to create a new auth object everytime?
+//   auth.credentials = token;
+//
+//   // Get everything that happened to the user's mailbox after we last checked
+//   const response = await listHistory({
+//     userId: emailAddress,
+//     auth,
+//     startHistoryId: historyId || newHistoryId
+//   });
+//
+//   if (!response.history) {
+//     return;
+//   }
+//
+//   const { observedLabels } = program.state;
+//
+//   // Dispatch events
+//   for (let item of response.history) {
+//     const { labelsAdded, messagesAdded } = item;
+//
+//     // if (messagesAdded) {
+//     //   for (let messageAdded of messagesAdded) {
+//     //     const { labelIds, id } = messageAdded.message;
+//     //     for (let labelId of labelIds) {
+//     //       if (observedLabels.indexOf(labelId) >= 0) {
+//     //         root.labels.one({ id: labelId })
+//     //           .messageAdded
+//     //           .dispatch({
+//     //             message: root.messages.one({ id })
+//     //           });
+//     //       }
+//     //     }
+//     //   }
+//     // }
+//
+//     if (labelsAdded) {
+//       for (let labelAdded of labelsAdded) {
+//         const { labelIds, message } = labelAdded;
+//         for (let labelId of labelIds) {
+//           if (observedLabels.indexOf(labelId) >= 0) {
+//             root.labels.one({ id: labelId })
+//               .messageAdded
+//               .dispatch({
+//                 message: root.messages.one({ id: message.id })
+//               });
+//           }
+//         }
+//       }
+//     }
+//
+//     // if (labelsAdded) {
+//     //   for (let labelAdded of labelsAdded) {
+//     //     const labelIds = labelAdded.labelIds;
+//     //     if (labelIds && labelIds.indexOf('STARRED') >= 0) {
+//     //       const { id } = labelAdded.message;
+//     //       root.messages.messageStarred.dispatch({ message: root.messages.one({ id }) });
+//     //     }
+//     //   }
+//     // }
+//   }
+//
+//   // Save this history id for next time
+//   program.state.historyId = newHistoryId;
+//   await program.save();
+// }
 
 export async function endpoint({ name, req }) {
   switch (name) {
@@ -252,8 +252,8 @@ export let Root = {
 export let MessageCollection = {
   one({ args }) {
     auth.credentials = program.state.token;
-    return getMessage({ userId: 'me', auth, id: args.id });
-
+    const { data } = getMessage({ userId: 'me', auth, id: args.id });
+    return data;
     // batching:
     // return messageLoader.load(args.id);
   },
@@ -276,7 +276,8 @@ export let MessageCollection = {
     }
 
     auth.credentials = program.state.token;
-    return await listMessage(options);
+    const { data } = await listMessage(options);
+    return data;
   }
 }
 
@@ -368,7 +369,7 @@ export let Header = {
 export let ThreadCollection = {
   async one({ args }) {
     auth.credentials = program.state.token;
-    const thread = await getThread({ userId: 'me', auth, id: args.id })
+    const { data: thread } = await getThread({ userId: 'me', auth, id: args.id })
 
     // Add some consistency by copying the snippet of the first message as the
     // snippet of the thread which is what threads.list seems to return.
@@ -395,8 +396,8 @@ export let ThreadCollection = {
     }
 
     auth.credentials = program.state.token;
-    const result = await listThread(options);
-    return result;
+    const { data } = await listThread(options);
+    return data.threads;
   }
 };
 
@@ -437,7 +438,8 @@ export let Thread = {
 export let LabelCollection = {
   one({ args }) {
     auth.credentials = program.state.token;
-    return getLabel({ userId: 'me', auth, id: args.id });
+    const { data: label } = getLabel({ userId: 'me', auth, id: args.id });
+    return label;
   },
 
   async withName({ args }) {
@@ -458,8 +460,8 @@ export let LabelCollection = {
     };
 
     auth.credentials = program.state.token;
-    const result = await listLabel(options);
-    return result.labels;
+    const { data } = await listLabel(options);
+    return data.labels;
   }
 };
 
