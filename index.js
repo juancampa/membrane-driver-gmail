@@ -10,23 +10,23 @@ const { root } = program.refs;
 import DataLoader from 'dataloader';
 
 // Simplify these resolvers once the sdk add support for promises
-const getToken = promisify(auth.getToken.bind(auth));
-const getProfile = promisify(gmail.users.getProfile.bind(gmail.users));
-const watch = promisify(gmail.users.watch.bind(gmail.users));
-const stop = promisify(gmail.users.stop.bind(gmail.users));
-const listHistory = promisify(gmail.users.history.list.bind(gmail.users.history));
+const getToken = promisify(auth.getToken.bind(auth)).then(({ data }) => data);
+const getProfile = promisify(gmail.users.getProfile.bind(gmail.users)).then(({ data }) => data);
+const watch = promisify(gmail.users.watch.bind(gmail.users)).then(({ data }) => data);
+const stop = promisify(gmail.users.stop.bind(gmail.users)).then(({ data }) => data);
+const listHistory = promisify(gmail.users.history.list.bind(gmail.users.history)).then(({ data }) => data);
 
 const messages = gmail.users.messages;
-const getMessage = promisify(messages.get.bind(messages));
-const listMessage = promisify(messages.list.bind(messages));
+const getMessage = promisify(messages.get.bind(messages)).then(({ data }) => data);
+const listMessage = promisify(messages.list.bind(messages)).then(({ data }) => data);
 
 const threads = gmail.users.threads;
-const getThread = promisify(threads.get.bind(threads));
-const listThread = promisify(threads.list.bind(threads));
+const getThread = promisify(threads.get.bind(threads)).then(({ data }) => data);
+const listThread = promisify(threads.list.bind(threads)).then(({ data }) => data);
 
 const labels = gmail.users.labels;
-const getLabel = promisify(labels.get.bind(labels));
-const listLabel = promisify(labels.list.bind(labels));
+const getLabel = promisify(labels.get.bind(labels)).then(({ data }) => data);
+const listLabel = promisify(labels.list.bind(labels)).then(({ data }) => data);
 
 const TOPIC = 'gmail-driver-webhooks';
 
@@ -396,7 +396,7 @@ export let ThreadCollection = {
 
     auth.credentials = program.state.token;
     const result = await listThread(options);
-    return result.data;
+    return result;
   }
 };
 
@@ -458,7 +458,8 @@ export let LabelCollection = {
     };
 
     auth.credentials = program.state.token;
-    return (await listLabel(options)).labels;
+    const result = await listLabel(options);
+    return result.labels;
   }
 };
 
