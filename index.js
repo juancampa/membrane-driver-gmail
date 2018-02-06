@@ -81,23 +81,7 @@ export async function init() {
   //
   // await pubsub.topic({name: 'gmail-driver-webhooks'}).messageReceived.subscribe('onWebhook');
 
-  // The oauth state field is used to retrieve this same account when the user
-  // accepts the consent screen and it gets redirected to our redirect endpoint
-  const authState = randomBytes(32).toString('hex');
-  program.state.authState = authState;
-  await program.save();
-
-  // generate the url the user can use to authorize our client
-  const url = auth.generateAuthUrl({
-    access_type: 'offline',
-    prompt: 'consent',
-    state: authState,
-    scope: [
-      'https://www.googleapis.com/auth/gmail.readonly',
-    ]
-  });
-
-  console.log('Please go to:', url);
+  console.log('Please go to:', program.endpoints.auth.url);
   console.log('Redirect URL:', program.endpoints.redirect.url);
 }
 
@@ -207,6 +191,33 @@ export async function onWebhook({ sender, args }) {
 
 export async function endpoint({ name, req }) {
   switch (name) {
+    case 'auth': {
+      // The oauth state field is used to retrieve this same account when the user
+      // accepts the consent screen and it gets redirected to our redirect endpoint
+      const authState = randomBytes(32).toString('hex');
+      program.state.authState = authState;
+      await program.save();
+
+      // generate the url the user can use to authorize our client
+      const authUrl = auth.generateAuthUrl({
+        access_type: 'offline',
+        prompt: 'consent',
+        state: authState,
+        scope: ['https://www.googleapis.com/auth/gmail.readonly']
+      });
+
+      return {
+        body: `
+          <html>
+            <body>
+              <center>
+                <a href="${authUrl}">Authorize with Google</a>
+              </center>
+            </body>
+          </html>
+        `
+      }
+    }
     case 'redirect': {
       const { code, state: authState } = parseQuery(parseUrl(req.url).query);
       if (!code || authState != program.state.authState) {
