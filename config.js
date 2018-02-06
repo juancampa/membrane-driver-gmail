@@ -15,7 +15,7 @@ environment
 
 // Endpoints
 endpoints
-  .https('auth', 'Visit this endpoint to authorize access to your account')
+  .https('auth', 'Visit this endpoint to authorize access to your account', { response: true })
   .https('redirect', 'Set this URL in Google API Console for oauth redirect')
 
 // Parseable expressions
