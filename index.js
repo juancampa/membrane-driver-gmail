@@ -250,7 +250,7 @@ export let Root = {
 }
 
 export let MessageCollection = {
-  one({ args }) {
+  async one({ args }) {
     auth.credentials = program.state.token;
     const { data: message } = await getMessage({ userId: 'me', auth, id: args.id });
     return message;
