@@ -252,8 +252,8 @@ export let Root = {
 export let MessageCollection = {
   one({ args }) {
     auth.credentials = program.state.token;
-    const { data } = getMessage({ userId: 'me', auth, id: args.id });
-    return data;
+    const { data: message } = await getMessage({ userId: 'me', auth, id: args.id });
+    return message;
     // batching:
     // return messageLoader.load(args.id);
   },
@@ -397,6 +397,8 @@ export let ThreadCollection = {
 
     auth.credentials = program.state.token;
     const { data } = await listThread(options);
+    console.error(options);
+    console.error(data);
     return data;
   }
 };
