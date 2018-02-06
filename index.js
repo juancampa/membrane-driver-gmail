@@ -396,8 +396,7 @@ export let ThreadCollection = {
 
     auth.credentials = program.state.token;
     const result = await listThread(options);
-    console.log('THREADS', result);
-    return result;
+    return result.data;
   }
 };
 
