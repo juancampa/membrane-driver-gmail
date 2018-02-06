@@ -220,13 +220,13 @@ export async function endpoint({ name, req }) {
       // Listen for changes in this user's inbox. This driver could start
       // watching when a subscription is made but it requires keeping track of a
       // lot of things so I'm skipping that for now.
-      const response = await watch({
-        userId: profile.emailAddress,
-        auth,
-        resource: {
-          topicName: 'projects/modular-silicon-111805/topics/gmail-driver-webhooks', 
-        },
-      });
+      // const response = await watch({
+      //   userId: profile.emailAddress,
+      //   auth,
+      //   resource: {
+      //     topicName: 'projects/modular-silicon-111805/topics/gmail-driver-webhooks', 
+      //   },
+      // });
 
       Object.assign(program.state, { token, historyId: response.historyId });
       await program.save();
