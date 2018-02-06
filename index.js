@@ -227,8 +227,9 @@ export async function endpoint({ name, req }) {
       //     topicName: 'projects/modular-silicon-111805/topics/gmail-driver-webhooks', 
       //   },
       // });
+      // Object.assign(program.state, { token, historyId: response.historyId });
 
-      Object.assign(program.state, { token, historyId: response.historyId });
+      Object.assign(program.state, { token });
       await program.save();
     }
   }
