@@ -28,6 +28,9 @@ const labels = gmail.users.labels;
 const getLabel = promisify(labels.get.bind(labels));
 const listLabel = promisify(labels.list.bind(labels));
 
+const o1 = {};
+const o2 = { ...o1 };
+
 const TOPIC = 'gmail-driver-webhooks';
 
 // Batching. TODO: it works but the node must send batched resolves which is
