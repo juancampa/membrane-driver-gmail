@@ -1,4 +1,4 @@
-const { dependencies, endpoints, environment, imports, schema, expressions } = program;
+const { dependencies, endpoints, environment, imports, schema, expressions, tests } = program;
 
 // Environment
 environment
@@ -127,4 +127,8 @@ schema.type('Header')
   // we need to look at the ref of the list which is currently not provided to the
   // resolver so we need to fix that
   .computed('self', 'Header*')
+
+tests
+  .add('auth', 'The driver has authenticated correctly with the Gmail API')
+  .add('access', 'The driver can acces the Gmail API and retrieve data')
 

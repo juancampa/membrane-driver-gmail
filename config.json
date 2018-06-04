@@ -1,5 +1,4 @@
 {
- "imports": [],
  "dependencies": [],
  "environment": [
   {
@@ -28,6 +27,7 @@
   }
  ],
  "schema": {
+  "imports": [],
   "types": [
    {
     "name": "Root",
@@ -562,5 +562,15 @@
   }
  ],
  "database": [],
+ "tests": [
+  {
+   "name": "auth",
+   "description": "The driver has authenticated correctly with the Gmail API"
+  },
+  {
+   "name": "access",
+   "description": "The driver can acces the Gmail API and retrieve data"
+  }
+ ],
  "isDriver": false
 }
