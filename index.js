@@ -89,13 +89,14 @@ export async function update({ previousVersion }) {
   console.log('updating Gmail Driver from previous version: ', previousVersion);
 }
 
-export async function test(name) {
+export async function test({ name }) {
   switch (name) {
     case 'auth':
     case 'access':
     case 'webhooks':
       return false;
   }
+  return false;
 }
 
 export function parse({ name, value }) {
