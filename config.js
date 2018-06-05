@@ -5,6 +5,11 @@ environment
   .add('CLIENT_ID', 'The API clientID')
   .add('CLIENT_SECRET', 'The API client secret')
 
+tests
+  .add('auth', 'The driver has authenticated correctly with the Gmail API')
+  .add('access', 'The driver can acces the Gmail API and retrieve data')
+  .add('webhooks', 'The driver can receive webhooks from gmail')
+
 // Imports
 // imports
 //   .add('googlepubsub')
@@ -127,8 +132,4 @@ schema.type('Header')
   // we need to look at the ref of the list which is currently not provided to the
   // resolver so we need to fix that
   .computed('self', 'Header*')
-
-tests
-  .add('auth', 'The driver has authenticated correctly with the Gmail API')
-  .add('access', 'The driver can acces the Gmail API and retrieve data')
 

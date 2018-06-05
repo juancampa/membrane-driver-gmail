@@ -570,6 +570,10 @@
   {
    "name": "access",
    "description": "The driver can acces the Gmail API and retrieve data"
+  },
+  {
+   "name": "webhooks",
+   "description": "The driver can receive webhooks from gmail"
   }
  ],
  "isDriver": false
