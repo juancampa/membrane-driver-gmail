@@ -91,29 +91,35 @@ export async function update({ previousVersion }) {
 
 export async function test({ name }) {
   switch (name) {
-    case 'auth':
+    case 'auth': {
       if (program.state.token) {
         return true;
       }
-    case 'access':
+      break;
+    }
+    case 'access': {
       if (!program.state.token) {
         return false;
       }
       auth.credentials = program.state.token;
 
       try {
-        const response = await listHistory({
-          userId: emailAddress,
+        const response = await listThread({
+          userId: 'me',
           auth,
           maxResults: 1,
         });
-        console.log('RESPONSE', response);
-        return true;
-      } catch {
+        return response && response.status === 200;
+      } catch (e) {
         return false;
       }
-    case 'webhooks':
+
+      break;
+    }
+    case 'webhooks': {
+      // TODO
       return false;
+    }
   }
   return false;
 }
