@@ -92,6 +92,9 @@ export async function update({ previousVersion }) {
 export async function test({ name }) {
   switch (name) {
     case 'auth':
+      if (program.state.token) {
+        return true;
+      }
     case 'access':
     case 'webhooks':
       return false;
