@@ -96,6 +96,22 @@ export async function test({ name }) {
         return true;
       }
     case 'access':
+      if (!program.state.token) {
+        return false;
+      }
+      auth.credentials = program.state.token;
+
+      try {
+        const response = await listHistory({
+          userId: emailAddress,
+          auth,
+          maxResults: 1,
+        });
+        console.log('RESPONSE', response);
+        return true;
+      } catch {
+        return false;
+      }
     case 'webhooks':
       return false;
   }
