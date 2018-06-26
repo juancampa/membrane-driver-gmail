@@ -30,6 +30,7 @@ const listLabel = promisify(labels.list.bind(labels));
 
 const TOPIC = 'gmail-driver-webhooks';
 
+
 // Batching. TODO: it works but the node must send batched resolves which is
 // currently not doing
 // const messageLoader = new DataLoader(async (keys) => {
@@ -306,6 +307,8 @@ export let MessageCollection = {
         options[param] = args[param];
       }
     }
+
+    // TODO: pageSize and maxResults are not the same
     if (args.pageSize !== undefined) {
       options.maxResults = args.pageSize;
     }
