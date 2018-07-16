@@ -1,4 +1,5 @@
 import { gmail, auth } from './client.js';
+import * as pubsub from './pubsub'
 import { randomBytes } from 'crypto';
 import { promisify } from 'util';
 import { parse as parseQuery } from 'querystring';
@@ -264,17 +265,35 @@ export async function endpoint({ name, req }) {
       auth.credentials = token;
       const profile = await getProfile({ userId: 'me', auth });
 
+      // TODO: Commenting this out until we can webpack the pubsub program correctly
+      try {
+        await pubsub.createTopic({ name: TOPIC });
+        // TODO: use the IAM API to allow gmail to post to this topic
+      
+      } catch (err) {
+        // google-cloud errors have a status field that is more reliable than
+        // checking the message but it doesn't go through our message queue
+        if (!err.toString().indexOf('already exists')) {
+          throw err;
+        }
+      }
+
+      // TODO url ???
+      //const options = { pushEndpoint: program.endpoints.webhooks.url };
+      const name = pubsub.getSubscriptionName(TOPIC);
+      await client.subscribe(TOPIC, name, options);
+
       // Listen for changes in this user's inbox. This driver could start
       // watching when a subscription is made but it requires keeping track of a
       // lot of things so I'm skipping that for now.
-      // const response = await watch({
-      //   userId: profile.emailAddress,
-      //   auth,
-      //   resource: {
-      //     topicName: 'projects/modular-silicon-111805/topics/gmail-driver-webhooks', 
-      //   },
-      // });
-      // Object.assign(program.state, { token, historyId: response.historyId });
+      const response = await watch({
+        userId: profile.emailAddress,
+        auth,
+        resource: {
+          topicName: 'projects/modular-silicon-111805/topics/gmail-driver-webhooks', 
+        },
+      });
+      Object.assign(program.state, { token, historyId: response.historyId });
 
       Object.assign(program.state, { token });
       await program.save();

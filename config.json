@@ -8,6 +8,18 @@
   {
    "name": "CLIENT_SECRET",
    "description": "The API client secret"
+  },
+  {
+   "name": "projectId",
+   "description": "The Project ID"
+  },
+  {
+   "name": "clientEmail",
+   "description": "The email address as provided by Google Cloud Console"
+  },
+  {
+   "name": "privateKey",
+   "description": "The private key"
   }
  ],
  "endpoints": [

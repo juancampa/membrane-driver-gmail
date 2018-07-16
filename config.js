@@ -4,6 +4,9 @@ const { dependencies, endpoints, environment, imports, schema, expressions, test
 environment
   .add('CLIENT_ID', 'The API clientID')
   .add('CLIENT_SECRET', 'The API client secret')
+  .add('projectId', 'The Project ID')
+  .add('clientEmail', 'The email address as provided by Google Cloud Console')
+  .add('privateKey', 'The private key')
 
 tests
   .add('auth', 'The driver has authenticated correctly with the Gmail API')
