@@ -3,6 +3,7 @@ import { randomBytes } from 'crypto';
 import { promisify } from 'util';
 import { parse as parseQuery } from 'querystring';
 import { parse as parseUrl } from 'url';
+import btoa from 'btoa'; 
 
 const { root } = program.refs;
 
@@ -313,8 +314,36 @@ export let MessageCollection = {
     auth.credentials = program.state.token;
     const { data } = await listMessage(options);
     return data;
+  },
+  async send({ args }) {
+    auth.credentials = program.state.token;
+    const { data } = await getProfile({ userId: "me", auth });
+    const { from, to, body, subject } = args;
+    const From = from ? from : data.emailAddress;
+
+    const base64EncodedEmail = btoa(
+      `Content-Type:  text/plain;
+      charset="UTF-8"\n
+      Content-length: 5000\n
+      Content-Transfer-Encoding: message/rfc2822\n
+      to: ${to}\n
+      from: ${from}\n
+      subject: ${subject}\n\n
+      ${body}`
+    )
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
+
+    const res = await sendMessage({
+      userId: "me",
+      auth,
+      resource: {
+        raw: base64EncodedEmail
+      }
+    });
+    return res.data;
   }
-}
+};
 
 export let MessagePage = {
   next({ self, source }) {

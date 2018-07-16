@@ -70,7 +70,12 @@ schema.type('MessageCollection')
     .param('labelIds', 'String', 'Only return messages with labels that match all of the specified label IDs')
     .param('pageToken', 'String', 'Page token to retrieve a specific page of results in the list')
     .param('q', 'String', 'Only return messages matching the specified query. Supports the same query format as the Gmail search box')
-
+  .action('send')
+    .param('to', 'String', 'to email address of the receiver')
+    .param('from', 'String', 'from email address of the sender, the mailbox account')
+    .param('subject', 'String', 'subject of the email')
+    .param('body', 'String', 'body text of the email')
+    
 schema.type('MessagePage')
   .computed('items', '[MessagePageItem]')
   .computed('next', 'MessagePage*')
