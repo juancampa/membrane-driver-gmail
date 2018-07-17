@@ -4,7 +4,7 @@ import { randomBytes } from 'crypto';
 import { promisify } from 'util';
 import { parse as parseQuery } from 'querystring';
 import { parse as parseUrl } from 'url';
-import btoa from 'btoa'; 
+import btoa from 'btoa';
 
 const { root } = program.refs;
 
@@ -67,21 +67,6 @@ export async function init() {
     messages: {},
     labels: {},
   });
-
-  // TODO: Commenting this out until we can webpack the pubsub program correctly
-  // try {
-  //   await pubsub.createTopic({ name: TOPIC });
-  //   // TODO: use the IAM API to allow gmail to post to this topic
-  //
-  // } catch (err) {
-  //   // google-cloud errors have a status field that is more reliable than
-  //   // checking the message but it doesn't go through our message queue
-  //   if (!err.toString().indexOf('already exists')) {
-  //     throw err;
-  //   }
-  // }
-  //
-  // await pubsub.topic({name: 'gmail-driver-webhooks'}).messageReceived.subscribe('onWebhook');
 
   console.log('Please go to:', program.endpoints.auth.url);
   console.log('Redirect URL:', program.endpoints.redirect.url);
@@ -265,11 +250,10 @@ export async function endpoint({ name, req }) {
       auth.credentials = token;
       const profile = await getProfile({ userId: 'me', auth });
 
-      // TODO: Commenting this out until we can webpack the pubsub program correctly
       try {
         await pubsub.createTopic({ name: TOPIC });
         // TODO: use the IAM API to allow gmail to post to this topic
-      
+
       } catch (err) {
         // google-cloud errors have a status field that is more reliable than
         // checking the message but it doesn't go through our message queue
@@ -278,8 +262,7 @@ export async function endpoint({ name, req }) {
         }
       }
 
-      // TODO url ???
-      //const options = { pushEndpoint: program.endpoints.webhooks.url };
+      const options = { pushEndpoint: program.endpoints.webhooks.url };
       const name = pubsub.getSubscriptionName(TOPIC);
       await client.subscribe(TOPIC, name, options);
 
@@ -290,7 +273,7 @@ export async function endpoint({ name, req }) {
         userId: profile.emailAddress,
         auth,
         resource: {
-          topicName: 'projects/modular-silicon-111805/topics/gmail-driver-webhooks', 
+          topicName: 'projects/modular-silicon-111805/topics/gmail-driver-webhooks',
         },
       });
       Object.assign(program.state, { token, historyId: response.historyId });

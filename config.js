@@ -4,9 +4,7 @@ const { dependencies, endpoints, environment, imports, schema, expressions, test
 environment
   .add('CLIENT_ID', 'The API clientID')
   .add('CLIENT_SECRET', 'The API client secret')
-  .add('projectId', 'The Project ID')
-  .add('clientEmail', 'The email address as provided by Google Cloud Console')
-  .add('privateKey', 'The private key')
+  .add('SERVICE_ACCOUNT_JSON', 'The API Service Account key in JSON format. Get it at https://console.cloud.google.com/apis/credentials')
 
 tests
   .add('auth', 'The driver has authenticated correctly with the Gmail API')
@@ -78,7 +76,7 @@ schema.type('MessageCollection')
     .param('from', 'String', 'from email address of the sender, the mailbox account')
     .param('subject', 'String', 'subject of the email')
     .param('body', 'String', 'body text of the email')
-    
+
 schema.type('MessagePage')
   .computed('items', '[MessagePageItem]')
   .computed('next', 'MessagePage*')

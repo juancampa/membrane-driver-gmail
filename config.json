@@ -10,16 +10,8 @@
    "description": "The API client secret"
   },
   {
-   "name": "projectId",
-   "description": "The Project ID"
-  },
-  {
-   "name": "clientEmail",
-   "description": "The email address as provided by Google Cloud Console"
-  },
-  {
-   "name": "privateKey",
-   "description": "The private key"
+   "name": "SERVICE_ACCOUNT_JSON",
+   "description": "The API Service Account key in JSON format. Get it at https://console.cloud.google.com/apis/credentials"
   }
  ],
  "endpoints": [
