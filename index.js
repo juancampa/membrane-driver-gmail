@@ -3,6 +3,7 @@ import { randomBytes } from 'crypto';
 import { promisify } from 'util';
 import { parse as parseQuery } from 'querystring';
 import { parse as parseUrl } from 'url';
+import gmailEncoder from './gmailEncoder';
 
 const { root } = program.refs;
 
@@ -125,6 +126,16 @@ export async function test({ name }) {
   return false;
 }
 
+// This doesn't work for some cases. Only threads for now
+function decodeUrlId(id) {
+  const decoded = gmailDecoder.decode(id);
+  const dash = decoded.indexOf('-');
+  if (dash >= 0) {
+    return BigInt(decoded.substr(dash + 1)).toString(16);
+  }
+  return id;
+}
+
 export function parse({ name, value }) {
   console.log('Parsing', name, value);
   switch (name) {
@@ -143,10 +154,10 @@ export function parse({ name, value }) {
         if (isLabel) {
           return root.threads.page({ q: `label:${decodeURIComponent(parts[0])}` })
         } else {
-          return root.threads.one({ id: parts[0] })
+          return root.threads.one({ id: decodeUrlId(parts[0]) })
         }
       } else if (parts.length === 2) {
-        return root.threads.one({ id: parts[1] })
+        return root.threads.one({ id: decodeUrlId(parts[1]) })
       }
     }
   }
