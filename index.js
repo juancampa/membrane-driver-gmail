@@ -136,6 +136,14 @@ function decodeUrlId(id) {
   return id;
 }
 
+// Completes fields that are missing from the source object but are requested
+// by the query (as determined by the info argument). The remaining fields are
+// completed by querying them from the provided ref.
+async function completeMissingFields(source, ref, info) {
+  console.log(info);
+  return source;
+}
+
 export function parse({ name, value }) {
   console.log('Parsing', name, value);
   switch (name) {
@@ -339,8 +347,10 @@ export let MessagePage = {
     return root.messages.page({ ...args, pageToken: source.nextPageToken })
   },
 
-  items({ source }) {
-    return source.messages;
+  items({ source, info }) {
+    return Promise.all(source.messages.map((item) => {
+      return completeMissingFields(item, root.messages.one({ id: item.id }), info)
+    }));
   }
 };
 
