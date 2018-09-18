@@ -136,12 +136,36 @@ function decodeUrlId(id) {
   return id;
 }
 
+// const graphql = require('graphql');
+// // If the passed AST node (info) is not a scalar, build a subquery that selects
+// // everything queried by the field nodes
+// export function createSubquery(info, qlType) {
+//   let subquery = '';
+//   if (!graphql.isLeafType(qlType)) {
+//     subquery = info.fieldNodes.map((ast) => {
+//       let { loc: { start, end, source } } = ast.selectionSet;
+//       let subselection = source.body.substring(start, end);
+//       subselection = subselection.replace(/(^\s*{\s*|\s*}\s*$)/g, '');
+//       return subselection;
+//     }).join(', ');
+//     subquery = '{ ' + subquery + ' }';
+//   }
+//   return subquery;
+// }
+
 // Completes fields that are missing from the source object but are requested
 // by the query (as determined by the info argument). The remaining fields are
 // completed by querying them from the provided ref.
 async function completeMissingFields(source, ref, info) {
-  console.log(info);
-  return source;
+  // TODO: this can be optimized to only query the missing fields, instead of
+  // all the fields
+  const subquery = global.qlHelper.createSubquery(info);
+  const result = await ref.$query(subquery);
+
+  return {
+    ...result,
+    ...source,
+  };
 }
 
 export function parse({ name, value }) {

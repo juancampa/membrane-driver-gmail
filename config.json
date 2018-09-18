@@ -264,7 +264,7 @@
       "name": "items",
       "type": "List",
       "ofType": {
-       "type": "MessagePageItem"
+       "type": "Message"
       }
      },
      {
