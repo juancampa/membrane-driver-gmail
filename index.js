@@ -407,6 +407,9 @@ export let Message = {
 
   text({ self, source }) {
     let result = '';
+    if (!source.payload) {
+      return null;
+    }
     const stack = [source.payload];
     while (stack.length > 0) {
       const part = stack.pop();
