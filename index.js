@@ -34,32 +34,32 @@ const TOPIC = 'gmail-driver-webhooks';
 
 // Batching. TODO: it works but the node must send batched resolves which is
 // currently not doing
-// const messageLoader = new DataLoader(async (keys) => {
-//   const batch = new Batchelor({
-//     uri: 'https://www.googleapis.com/batch',
-//     // uri: 'https://localhost:4445/batch',
-//     auth: { bearer: program.state.token.access_token },
-//     headers: { 'Content-Type': 'multipart/mixed' }
-//   });
-//   console.log('<<<<<< Batching', keys.length, 'calls');
-//   for (let key of keys) {
-//     batch.add({
-//       method: 'GET',
-//       path: `/gmail/v1/users/me/messages/${key}`,
-//       headers: { authorization: 'Bearer ' + program.state.token.access_token },
-//     })
-//   }
-//   return new Promise((resolve, reject) => {
-//     batch.run((err, response) => {
-//       if (err) {
-//         return reject(err);
-//       }
-//       const result = response.parts.map((part) => part.body);
-//       console.log(result);
-//       resolve(result);
-//     });
-//   });
-// });
+const messageLoader = new DataLoader(async (keys) => {
+  const batch = new Batchelor({
+    uri: 'https://www.googleapis.com/batch/gmail/v1',
+    // uri: 'https://localhost:4445/batch',
+    auth: { bearer: program.state.token.access_token },
+    headers: { 'Content-Type': 'multipart/mixed' }
+  });
+  console.log('<<<<<< Batching', keys.length, 'calls');
+  for (let key of keys) {
+    batch.add({
+      method: 'GET',
+      path: `/gmail/v1/users/me/messages/${key}`,
+      headers: { authorization: 'Bearer ' + program.state.token.access_token },
+    })
+  }
+  return new Promise((resolve, reject) => {
+    batch.run((err, response) => {
+      if (err) {
+        return reject(err);
+      }
+      const result = response.parts.map((part) => part.body);
+      console.log(result);
+      resolve(result);
+    });
+  });
+});
 
 export async function init() {
   await root.set({
@@ -332,9 +332,9 @@ export let MessageCollection = {
   async one({ args }) {
     auth.credentials = program.state.token;
     const { data: message } = await getMessage({ userId: 'me', auth, id: args.id });
-    return message;
+    // return message;
     // batching:
-    // return messageLoader.load(args.id);
+    return messageLoader.load(args.id);
   },
 
   async page({ args }) {
