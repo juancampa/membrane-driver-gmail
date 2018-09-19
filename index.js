@@ -7,7 +7,7 @@ import gmailEncoder from './gmailEncoder';
 
 const { root } = program.refs;
 
-// import Batchelor from 'batchelor';
+import Batchelor from 'batchelor';
 import DataLoader from 'dataloader';
 
 // Simplify these resolvers once the sdk add support for promises
@@ -34,6 +34,8 @@ const TOPIC = 'gmail-driver-webhooks';
 
 // Batching. TODO: it works but the node must send batched resolves which is
 // currently not doing
+// TODO: replace Batchelor with something that doesn't bring a millon
+// dependencies
 const messageLoader = new DataLoader(async (keys) => {
   const batch = new Batchelor({
     uri: 'https://www.googleapis.com/batch/gmail/v1',
