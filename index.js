@@ -402,7 +402,15 @@ export let Message = {
     }
     return root.threads.one({ id })
   },
-
+  from({ source }) {
+    return (source.payload.headers.find((h) => h.name === 'From') || {}).value;
+  },
+  to({ source }) {
+    return (source.payload.headers.find((h) => h.name === 'To') || {}).value;
+  },
+  subject({ source }) {
+    return (source.payload.headers.find((h) => h.name === 'Subject') || {}).value;
+  }
 };
 
 export let HeaderCollection = {

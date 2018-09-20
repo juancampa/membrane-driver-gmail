@@ -1,550 +1,566 @@
 {
- "dependencies": [],
- "environment": [
-  {
-   "name": "CLIENT_ID",
-   "description": "The API clientID"
-  },
-  {
-   "name": "CLIENT_SECRET",
-   "description": "The API client secret"
-  }
- ],
- "endpoints": [
-  {
-   "name": "auth",
-   "type": "https",
-   "description": "Visit this endpoint to authorize access to your account",
-   "options": {
-    "response": true
-   }
-  },
-  {
-   "name": "redirect",
-   "type": "https",
-   "description": "Set this URL in Google API Console for oauth redirect",
-   "options": {}
-  }
- ],
- "schema": {
-  "imports": [],
-  "types": [
-   {
-    "name": "Root",
-    "fields": [
-     {
-      "name": "threads",
-      "type": "ThreadCollection"
-     },
-     {
-      "name": "messages",
-      "type": "MessageCollection"
-     },
-     {
-      "name": "labels",
-      "type": "LabelCollection"
-     }
-    ],
-    "computedFields": [],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "ThreadCollection",
-    "fields": [],
-    "computedFields": [
-     {
-      "name": "one",
-      "type": "Thread",
-      "description": "A thread. A set of messages grouped by subject",
-      "params": [
-       {
-        "name": "id",
-        "type": "String",
-        "description": "The id of the message"
-       }
-      ]
-     },
-     {
-      "name": "page",
-      "type": "ThreadPage",
-      "description": "All the threads",
-      "params": [
-       {
-        "name": "pageSize",
-        "type": "Int",
-        "description": "Maximum number of threads to return. Originally \"maxResults\""
-       },
-       {
-        "name": "includeSpamTrash",
-        "type": "Boolean",
-        "description": "Include threads from SPAM and TRASH in the results"
-       },
-       {
-        "name": "labelIds",
-        "type": "String",
-        "description": "Only return threads with labels that match all of the specified label IDs"
-       },
-       {
-        "name": "pageToken",
-        "type": "String",
-        "description": "Page token to retrieve a specific page of results in the list"
-       },
-       {
-        "name": "q",
-        "type": "String",
-        "description": "Only return threads matching the specified query. Supports the same query format as the Gmail search box"
-       }
-      ]
-     }
-    ],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "ThreadPage",
-    "fields": [],
-    "computedFields": [
-     {
-      "name": "items",
-      "type": "List",
-      "ofType": {
-       "type": "ThreadPageItem"
+  "dependencies": [],
+  "environment": [
+    {
+      "name": "CLIENT_ID",
+      "description": "The API clientID"
+    },
+    {
+      "name": "CLIENT_SECRET",
+      "description": "The API client secret"
+    }
+  ],
+  "endpoints": [
+    {
+      "name": "auth",
+      "type": "https",
+      "description": "Visit this endpoint to authorize access to your account",
+      "options": {
+        "response": true
       }
-     },
-     {
-      "name": "next",
-      "type": "Ref",
-      "ofType": {
-       "type": "ThreadPage"
+    },
+    {
+      "name": "redirect",
+      "type": "https",
+      "description": "Set this URL in Google API Console for oauth redirect",
+      "options": {}
+    }
+  ],
+  "schema": {
+    "imports": [],
+    "types": [
+      {
+        "name": "Root",
+        "fields": [
+          {
+            "name": "threads",
+            "type": "ThreadCollection"
+          },
+          {
+            "name": "messages",
+            "type": "MessageCollection"
+          },
+          {
+            "name": "labels",
+            "type": "LabelCollection"
+          }
+        ],
+        "computedFields": [],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "ThreadCollection",
+        "fields": [],
+        "computedFields": [
+          {
+            "name": "one",
+            "type": "Thread",
+            "description": "A thread. A set of messages grouped by subject",
+            "params": [
+              {
+                "name": "id",
+                "type": "String",
+                "description": "The id of the message"
+              }
+            ]
+          },
+          {
+            "name": "page",
+            "type": "ThreadPage",
+            "description": "All the threads",
+            "params": [
+              {
+                "name": "pageSize",
+                "type": "Int",
+                "description": "Maximum number of threads to return. Originally \"maxResults\""
+              },
+              {
+                "name": "includeSpamTrash",
+                "type": "Boolean",
+                "description": "Include threads from SPAM and TRASH in the results"
+              },
+              {
+                "name": "labelIds",
+                "type": "String",
+                "description": "Only return threads with labels that match all of the specified label IDs"
+              },
+              {
+                "name": "pageToken",
+                "type": "String",
+                "description": "Page token to retrieve a specific page of results in the list"
+              },
+              {
+                "name": "q",
+                "type": "String",
+                "description": "Only return threads matching the specified query. Supports the same query format as the Gmail search box"
+              }
+            ]
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "ThreadPage",
+        "fields": [],
+        "computedFields": [
+          {
+            "name": "items",
+            "type": "List",
+            "ofType": {
+              "type": "ThreadPageItem"
+            }
+          },
+          {
+            "name": "next",
+            "type": "Ref",
+            "ofType": {
+              "type": "ThreadPage"
+            }
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "ThreadPageItem",
+        "fields": [
+          {
+            "name": "id",
+            "type": "String",
+            "description": "The immutable ID of the thread"
+          },
+          {
+            "name": "snippet",
+            "type": "String",
+            "description": "A short part of the message text"
+          },
+          {
+            "name": "historyId",
+            "type": "Int",
+            "description": "The ID of the last history record that modified this thread"
+          },
+          {
+            "name": "messages",
+            "type": "List",
+            "ofType": {
+              "type": "Message"
+            },
+            "description": "The list of messages in the thread"
+          }
+        ],
+        "computedFields": [
+          {
+            "name": "self",
+            "type": "Ref",
+            "ofType": {
+              "type": "Thread"
+            },
+            "description": "A reference to the thread represented by this item"
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "Thread",
+        "description": "A collection of messages representing a conversation",
+        "fields": [
+          {
+            "name": "id",
+            "type": "String",
+            "description": "The immutable ID of the thread"
+          },
+          {
+            "name": "snippet",
+            "type": "String",
+            "description": "A short part of the message text"
+          },
+          {
+            "name": "historyId",
+            "type": "Int",
+            "description": "The ID of the last history record that modified this thread"
+          },
+          {
+            "name": "messages",
+            "type": "List",
+            "ofType": {
+              "type": "Message"
+            },
+            "description": "The list of messages in the thread"
+          }
+        ],
+        "computedFields": [
+          {
+            "name": "self",
+            "type": "Ref",
+            "ofType": {
+              "type": "Thread"
+            },
+            "description": "A reference to the thread represented by this item"
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "MessageCollection",
+        "fields": [],
+        "computedFields": [
+          {
+            "name": "one",
+            "type": "Message",
+            "description": "A message",
+            "params": [
+              {
+                "name": "id",
+                "type": "String",
+                "description": "The id of the message"
+              }
+            ]
+          },
+          {
+            "name": "page",
+            "type": "MessagePage",
+            "description": "All the messages",
+            "params": [
+              {
+                "name": "pageSize",
+                "type": "Int",
+                "description": "Maximum number of messages to return. Originally \"maxResults\""
+              },
+              {
+                "name": "includeSpamTrash",
+                "type": "Boolean",
+                "description": "Include messages from SPAM and TRASH in the results"
+              },
+              {
+                "name": "labelIds",
+                "type": "String",
+                "description": "Only return messages with labels that match all of the specified label IDs"
+              },
+              {
+                "name": "pageToken",
+                "type": "String",
+                "description": "Page token to retrieve a specific page of results in the list"
+              },
+              {
+                "name": "q",
+                "type": "String",
+                "description": "Only return messages matching the specified query. Supports the same query format as the Gmail search box"
+              }
+            ]
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "MessagePage",
+        "fields": [],
+        "computedFields": [
+          {
+            "name": "items",
+            "type": "List",
+            "ofType": {
+              "type": "Message"
+            }
+          },
+          {
+            "name": "next",
+            "type": "Ref",
+            "ofType": {
+              "type": "MessagePage"
+            }
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "Message",
+        "fields": [
+          {
+            "name": "id",
+            "type": "String",
+            "description": "The immutable ID of the message"
+          },
+          {
+            "name": "snippet",
+            "type": "String",
+            "description": "A short part of the message text"
+          },
+          {
+            "name": "labelIds",
+            "type": "List",
+            "ofType": {
+              "type": "String"
+            },
+            "description": "List of IDs of labels applied to this message"
+          },
+          {
+            "name": "historyId",
+            "type": "Int",
+            "description": "The ID of the last history record that modified this message"
+          },
+          {
+            "name": "internalDate",
+            "type": "String",
+            "description": "The internal message creation timestamp"
+          },
+          {
+            "name": "payload",
+            "type": "MessagePayload",
+            "description": "The parsed email structure in the message parts"
+          }
+        ],
+        "computedFields": [
+          {
+            "name": "thread",
+            "type": "Ref",
+            "ofType": {
+              "type": "Thread"
+            },
+            "description": "The thread this message belongs to"
+          },
+          {
+            "name": "text",
+            "type": "String",
+            "description": "Gets all the text/plain parts concatenated"
+          },
+          {
+            "name": "self",
+            "type": "Ref",
+            "ofType": {
+              "type": "Message"
+            },
+            "description": "A reference to the message represented by this item"
+          },
+          {
+            "name": "from",
+            "params": [],
+            "type": "String"
+          },
+          {
+            "name": "to",
+            "params": [],
+            "type": "String"
+          },
+          {
+            "name": "subject",
+            "params": [],
+            "type": "String"
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "LabelCollection",
+        "fields": [],
+        "computedFields": [
+          {
+            "name": "one",
+            "type": "Label",
+            "description": "A label",
+            "params": [
+              {
+                "name": "id",
+                "type": "String",
+                "description": "The id of the label"
+              }
+            ]
+          },
+          {
+            "name": "withName",
+            "type": "Ref",
+            "ofType": {
+              "type": "Label"
+            },
+            "description": "A label with the provided name",
+            "params": [
+              {
+                "name": "name",
+                "type": "String",
+                "description": "The name of the label"
+              }
+            ]
+          },
+          {
+            "name": "items",
+            "type": "List",
+            "ofType": {
+              "type": "Label"
+            },
+            "description": "All the labels"
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "Label",
+        "fields": [
+          {
+            "name": "id",
+            "type": "String",
+            "description": "The immutable ID of the label"
+          },
+          {
+            "name": "name",
+            "type": "String",
+            "description": "The display name of the label"
+          },
+          {
+            "name": "type",
+            "type": "String",
+            "description": "The owner type for the lable"
+          },
+          {
+            "name": "messagesTotal",
+            "type": "Int",
+            "description": "The total number of messages with the label"
+          },
+          {
+            "name": "messagesUnread",
+            "type": "Int",
+            "description": "The number of unread messages with the label"
+          },
+          {
+            "name": "threadsTotal",
+            "type": "Int",
+            "description": "The total number of threads with the label"
+          },
+          {
+            "name": "threadsUnread",
+            "type": "Int",
+            "description": "The number of unread threads with the label"
+          }
+        ],
+        "computedFields": [],
+        "actions": [],
+        "events": [
+          {
+            "name": "messageAdded",
+            "type": "Void",
+            "description": "Triggered when a message is added to this label",
+            "params": [
+              {
+                "name": "message",
+                "type": "Ref",
+                "ofType": {
+                  "type": "Message"
+                },
+                "description": "The message that was added to this label"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "MessagePayload",
+        "fields": [
+          {
+            "name": "partId",
+            "type": "String",
+            "description": "The immutable ID of the message part"
+          },
+          {
+            "name": "mimeType",
+            "type": "String",
+            "description": "The MIME type of the message part"
+          },
+          {
+            "name": "filename",
+            "type": "String",
+            "description": "The filename of the attachment"
+          },
+          {
+            "name": "headers",
+            "type": "HeaderCollection",
+            "description": "The collection of headers on this message part"
+          }
+        ],
+        "computedFields": [],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "HeaderCollection",
+        "fields": [],
+        "computedFields": [
+          {
+            "name": "one",
+            "type": "Header",
+            "params": [
+              {
+                "name": "name",
+                "type": "String"
+              }
+            ]
+          },
+          {
+            "name": "items",
+            "type": "List",
+            "ofType": {
+              "type": "Header"
+            }
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "Header",
+        "fields": [
+          {
+            "name": "name",
+            "type": "String",
+            "description": "The name of the header before the \":\" separator"
+          },
+          {
+            "name": "value",
+            "type": "String",
+            "description": "The value of the header after the \":\" separator"
+          }
+        ],
+        "computedFields": [
+          {
+            "name": "self",
+            "type": "Ref",
+            "ofType": {
+              "type": "Header"
+            }
+          }
+        ],
+        "actions": [],
+        "events": []
       }
-     }
-    ],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "ThreadPageItem",
-    "fields": [
-     {
-      "name": "id",
-      "type": "String",
-      "description": "The immutable ID of the thread"
-     },
-     {
-      "name": "snippet",
-      "type": "String",
-      "description": "A short part of the message text"
-     },
-     {
-      "name": "historyId",
-      "type": "Int",
-      "description": "The ID of the last history record that modified this thread"
-     },
-     {
-      "name": "messages",
-      "type": "List",
-      "ofType": {
-       "type": "Message"
-      },
-      "description": "The list of messages in the thread"
-     }
-    ],
-    "computedFields": [
-     {
-      "name": "self",
-      "type": "Ref",
-      "ofType": {
-       "type": "Thread"
-      },
-      "description": "A reference to the thread represented by this item"
-     }
-    ],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "Thread",
-    "description": "A collection of messages representing a conversation",
-    "fields": [
-     {
-      "name": "id",
-      "type": "String",
-      "description": "The immutable ID of the thread"
-     },
-     {
-      "name": "snippet",
-      "type": "String",
-      "description": "A short part of the message text"
-     },
-     {
-      "name": "historyId",
-      "type": "Int",
-      "description": "The ID of the last history record that modified this thread"
-     },
-     {
-      "name": "messages",
-      "type": "List",
-      "ofType": {
-       "type": "Message"
-      },
-      "description": "The list of messages in the thread"
-     }
-    ],
-    "computedFields": [
-     {
-      "name": "self",
-      "type": "Ref",
-      "ofType": {
-       "type": "Thread"
-      },
-      "description": "A reference to the thread represented by this item"
-     }
-    ],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "MessageCollection",
-    "fields": [],
-    "computedFields": [
-     {
-      "name": "one",
-      "type": "Message",
-      "description": "A message",
-      "params": [
-       {
-        "name": "id",
-        "type": "String",
-        "description": "The id of the message"
-       }
-      ]
-     },
-     {
-      "name": "page",
-      "type": "MessagePage",
-      "description": "All the messages",
-      "params": [
-       {
-        "name": "pageSize",
-        "type": "Int",
-        "description": "Maximum number of messages to return. Originally \"maxResults\""
-       },
-       {
-        "name": "includeSpamTrash",
-        "type": "Boolean",
-        "description": "Include messages from SPAM and TRASH in the results"
-       },
-       {
-        "name": "labelIds",
-        "type": "String",
-        "description": "Only return messages with labels that match all of the specified label IDs"
-       },
-       {
-        "name": "pageToken",
-        "type": "String",
-        "description": "Page token to retrieve a specific page of results in the list"
-       },
-       {
-        "name": "q",
-        "type": "String",
-        "description": "Only return messages matching the specified query. Supports the same query format as the Gmail search box"
-       }
-      ]
-     }
-    ],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "MessagePage",
-    "fields": [],
-    "computedFields": [
-     {
-      "name": "items",
-      "type": "List",
-      "ofType": {
-       "type": "Message"
-      }
-     },
-     {
-      "name": "next",
-      "type": "Ref",
-      "ofType": {
-       "type": "MessagePage"
-      }
-     }
-    ],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "Message",
-    "fields": [
-     {
-      "name": "id",
-      "type": "String",
-      "description": "The immutable ID of the message"
-     },
-     {
-      "name": "snippet",
-      "type": "String",
-      "description": "A short part of the message text"
-     },
-     {
-      "name": "labelIds",
-      "type": "List",
-      "ofType": {
-       "type": "String"
-      },
-      "description": "List of IDs of labels applied to this message"
-     },
-     {
-      "name": "historyId",
-      "type": "Int",
-      "description": "The ID of the last history record that modified this message"
-     },
-     {
-      "name": "internalDate",
-      "type": "String",
-      "description": "The internal message creation timestamp"
-     },
-     {
-      "name": "payload",
-      "type": "MessagePayload",
-      "description": "The parsed email structure in the message parts"
-     }
-    ],
-    "computedFields": [
-     {
-      "name": "thread",
-      "type": "Ref",
-      "ofType": {
-       "type": "Thread"
-      },
-      "description": "The thread this message belongs to"
-     },
-     {
-      "name": "text",
-      "type": "String",
-      "description": "Gets all the text/plain parts concatenated"
-     },
-     {
-      "name": "self",
-      "type": "Ref",
-      "ofType": {
-       "type": "Message"
-      },
-      "description": "A reference to the message represented by this item"
-     }
-    ],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "LabelCollection",
-    "fields": [],
-    "computedFields": [
-     {
-      "name": "one",
-      "type": "Label",
-      "description": "A label",
-      "params": [
-       {
-        "name": "id",
-        "type": "String",
-        "description": "The id of the label"
-       }
-      ]
-     },
-     {
-      "name": "withName",
-      "type": "Ref",
-      "ofType": {
-       "type": "Label"
-      },
-      "description": "A label with the provided name",
-      "params": [
-       {
-        "name": "name",
-        "type": "String",
-        "description": "The name of the label"
-       }
-      ]
-     },
-     {
-      "name": "items",
-      "type": "List",
-      "ofType": {
-       "type": "Label"
-      },
-      "description": "All the labels"
-     }
-    ],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "Label",
-    "fields": [
-     {
-      "name": "id",
-      "type": "String",
-      "description": "The immutable ID of the label"
-     },
-     {
-      "name": "name",
-      "type": "String",
-      "description": "The display name of the label"
-     },
-     {
-      "name": "type",
-      "type": "String",
-      "description": "The owner type for the lable"
-     },
-     {
-      "name": "messagesTotal",
-      "type": "Int",
-      "description": "The total number of messages with the label"
-     },
-     {
-      "name": "messagesUnread",
-      "type": "Int",
-      "description": "The number of unread messages with the label"
-     },
-     {
-      "name": "threadsTotal",
-      "type": "Int",
-      "description": "The total number of threads with the label"
-     },
-     {
-      "name": "threadsUnread",
-      "type": "Int",
-      "description": "The number of unread threads with the label"
-     }
-    ],
-    "computedFields": [],
-    "actions": [],
-    "events": [
-     {
-      "name": "messageAdded",
-      "type": "Void",
-      "description": "Triggered when a message is added to this label",
-      "params": [
-       {
-        "name": "message",
-        "type": "Ref",
-        "ofType": {
-         "type": "Message"
-        },
-        "description": "The message that was added to this label"
-       }
-      ]
-     }
     ]
-   },
-   {
-    "name": "MessagePayload",
-    "fields": [
-     {
-      "name": "partId",
-      "type": "String",
-      "description": "The immutable ID of the message part"
-     },
-     {
-      "name": "mimeType",
-      "type": "String",
-      "description": "The MIME type of the message part"
-     },
-     {
-      "name": "filename",
-      "type": "String",
-      "description": "The filename of the attachment"
-     },
-     {
-      "name": "headers",
-      "type": "HeaderCollection",
-      "description": "The collection of headers on this message part"
-     }
-    ],
-    "computedFields": [],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "HeaderCollection",
-    "fields": [],
-    "computedFields": [
-     {
-      "name": "one",
-      "type": "Header",
-      "params": [
-       {
-        "name": "name",
-        "type": "String"
-       }
-      ]
-     },
-     {
-      "name": "items",
-      "type": "List",
-      "ofType": {
-       "type": "Header"
-      }
-     }
-    ],
-    "actions": [],
-    "events": []
-   },
-   {
-    "name": "Header",
-    "fields": [
-     {
-      "name": "name",
-      "type": "String",
-      "description": "The name of the header before the \":\" separator"
-     },
-     {
-      "name": "value",
-      "type": "String",
-      "description": "The value of the header after the \":\" separator"
-     }
-    ],
-    "computedFields": [
-     {
-      "name": "self",
-      "type": "Ref",
-      "ofType": {
-       "type": "Header"
-      }
-     }
-    ],
-    "actions": [],
-    "events": []
-   }
-  ]
- },
- "expressions": [
-  {
-   "name": "url",
-   "pattern": "^https://mail.google.com/.+$",
-   "description": ""
-  }
- ],
- "database": [],
- "tests": [
-  {
-   "name": "auth",
-   "description": "The driver has authenticated correctly with the Gmail API"
   },
-  {
-   "name": "access",
-   "description": "The driver can acces the Gmail API and retrieve data"
-  },
-  {
-   "name": "webhooks",
-   "description": "The driver can receive webhooks from gmail"
-  }
- ],
- "isDriver": false
+  "expressions": [
+    {
+      "name": "url",
+      "pattern": "^https://mail.google.com/.+$",
+      "description": ""
+    }
+  ],
+  "database": [],
+  "tests": [
+    {
+      "name": "auth",
+      "description": "The driver has authenticated correctly with the Gmail API"
+    },
+    {
+      "name": "access",
+      "description": "The driver can acces the Gmail API and retrieve data"
+    },
+    {
+      "name": "webhooks",
+      "description": "The driver can receive webhooks from gmail"
+    }
+  ],
+  "isDriver": false,
+  "files": []
 }

@@ -1,6 +1,6 @@
 {
   "name": "gmail",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Gmail driver for Membrane",
   "repository": "git@github.com:juancampa/membrane-driver-gmail.git",
   "author": "Juan Campa <juancampa@gmail.com>",
