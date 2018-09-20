@@ -37,28 +37,38 @@ const TOPIC = 'gmail-driver-webhooks';
 // TODO: replace Batchelor with something that doesn't bring a millon
 // dependencies
 const messageLoader = new DataLoader(async (keys) => {
-  const batch = new Batchelor({
-    uri: 'https://www.googleapis.com/batch/gmail/v1',
-    // uri: 'https://localhost:4445/batch',
-    auth: { bearer: program.state.token.access_token },
-    headers: { 'Content-Type': 'multipart/mixed' }
-  });
-  console.log('<<<<<< Batching', keys.length, 'calls');
-  for (let key of keys) {
-    batch.add({
-      method: 'GET',
-      path: `/gmail/v1/users/me/messages/${key}`,
-      headers: { authorization: 'Bearer ' + program.state.token.access_token },
-    })
+  let batch;
+  try {
+    auth.credentials = program.state.token;
+    const { token } = await auth.getAccessToken();
+    batch = new Batchelor({
+      uri: 'https://www.googleapis.com/batch/gmail/v1',
+      // uri: 'http://localhost:8881/batch',
+      auth: { bearer: token },
+      headers: { 'Content-Type': 'multipart/mixed' }
+    });
+    console.log(`Batching ${keys.length} API calls`);
+    for (let key of keys) {
+      batch.add({
+        method: 'GET',
+        path: `/gmail/v1/users/me/messages/${key}`,
+        headers: { authorization: 'Bearer ' + token},
+      })
+    }
+  } catch (e) {
+    reject(e);
   }
   return new Promise((resolve, reject) => {
     batch.run((err, response) => {
       if (err) {
         return reject(err);
       }
-      const result = response.parts.map((part) => part.body);
-      console.log(result);
-      resolve(result);
+      resolve(response.parts.map((part) => {
+        if (String(part.statusCode) !== '200') {
+          return new Error(part.statusMessage || `Response returned status ${part.statusCode}`)
+        }
+        return part.body
+      }));
     });
   });
 });
@@ -138,40 +148,7 @@ function decodeUrlId(id) {
   return id;
 }
 
-// const graphql = require('graphql');
-// // If the passed AST node (info) is not a scalar, build a subquery that selects
-// // everything queried by the field nodes
-// export function createSubquery(info, qlType) {
-//   let subquery = '';
-//   if (!graphql.isLeafType(qlType)) {
-//     subquery = info.fieldNodes.map((ast) => {
-//       let { loc: { start, end, source } } = ast.selectionSet;
-//       let subselection = source.body.substring(start, end);
-//       subselection = subselection.replace(/(^\s*{\s*|\s*}\s*$)/g, '');
-//       return subselection;
-//     }).join(', ');
-//     subquery = '{ ' + subquery + ' }';
-//   }
-//   return subquery;
-// }
-
-// Completes fields that are missing from the source object but are requested
-// by the query (as determined by the info argument). The remaining fields are
-// completed by querying them from the provided ref.
-async function completeMissingFields(source, ref, info) {
-  // TODO: this can be optimized to only query the missing fields, instead of
-  // all the fields
-  const subquery = global.qlHelper.createSubquery(info);
-  const result = await ref.$query(subquery);
-
-  return {
-    ...result,
-    ...source,
-  };
-}
-
 export function parse({ name, value }) {
-  console.log('Parsing', name, value);
   switch (name) {
     case 'url': {
       const { hash } = parseUrl(value, true);
@@ -333,10 +310,12 @@ export let Root = {
 export let MessageCollection = {
   async one({ args }) {
     auth.credentials = program.state.token;
-    const { data: message } = await getMessage({ userId: 'me', auth, id: args.id });
-    // return message;
-    // batching:
+    // Batched
     return messageLoader.load(args.id);
+
+    // Not batched:
+    // const { data: message } = await getMessage({ userId: 'me', auth, id: args.id });
+    // return message;
   },
 
   async page({ args }) {
@@ -374,28 +353,20 @@ export let MessagePage = {
   },
 
   items({ source, info }) {
-    return Promise.all(source.messages.map((item) => {
-      return completeMissingFields(item, root.messages.one({ id: item.id }), info)
+    return Promise.all(source.messages.map(async (item) => {
+      const query = info.createMissingFieldsSubquery(item);
+      if (!query) {
+        return item;
+      }
+
+      // TODO: use an actual query so that we only fetch the missing fields
+      // TODO: for that to work though we need to implement local queries so
+      // that it doesn't even leave the worker, and/or, batching going up to the
+      // node and the node batching across multiple queries
+      const rest = await MessageCollection.one({ args: { id: item.id }});
+      return { ...item, ...rest };
     }));
   }
-};
-
-export let MessagePageItem = {
-  self({ source }) {
-    const { id } = source;
-    if (id === undefined || id === null) {
-      return null;
-    }
-    return root.messages.one({ id })
-  },
-
-  thread({ self, source }) {
-    const { threadId } = source;
-    if (threadId === undefined || threadId === null) {
-      return null;
-    }
-    return root.threads.one({ id: threadId })
-  },
 };
 
 export let Message = {

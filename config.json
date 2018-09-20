@@ -279,36 +279,6 @@
     "events": []
    },
    {
-    "name": "MessagePageItem",
-    "fields": [
-     {
-      "name": "id",
-      "type": "String",
-      "description": "The immutable ID of the thread"
-     }
-    ],
-    "computedFields": [
-     {
-      "name": "thread",
-      "type": "Ref",
-      "ofType": {
-       "type": "Thread"
-      },
-      "description": "The thread this message belongs to"
-     },
-     {
-      "name": "self",
-      "type": "Ref",
-      "ofType": {
-       "type": "Message"
-      },
-      "description": "A reference to the message represented by this item"
-     }
-    ],
-    "actions": [],
-    "events": []
-   },
-   {
     "name": "Message",
     "fields": [
      {
