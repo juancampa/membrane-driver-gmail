@@ -5,7 +5,6 @@ import { promisify } from 'util';
 import { parse as parseQuery } from 'querystring';
 import { parse as parseUrl } from 'url';
 // import gmailEncoder from './gmailEncoder';
-import btoa from 'btoa';
 
 const { root } = program.refs;
 
@@ -350,7 +349,7 @@ export let MessageCollection = {
     const { from, to, body, subject } = args;
     const From = from ? from : data.emailAddress;
 
-    const base64EncodedEmail = btoa(
+    const base64EncodedEmail = new Buffer(
       `Content-Type:  text/plain;
       charset="UTF-8"\n
       Content-length: 5000\n
@@ -359,7 +358,7 @@ export let MessageCollection = {
       from: ${from}\n
       subject: ${subject}\n\n
       ${body}`
-    )
+    ).toString('base64')
       .replace(/\+/g, "-")
       .replace(/\//g, "_");
 
