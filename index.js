@@ -1,9 +1,11 @@
 import { gmail, auth } from './client.js';
+import * as pubsub from './pubsub'
 import { randomBytes } from 'crypto';
 import { promisify } from 'util';
 import { parse as parseQuery } from 'querystring';
 import { parse as parseUrl } from 'url';
-import gmailEncoder from './gmailEncoder';
+// import gmailEncoder from './gmailEncoder';
+import btoa from 'btoa';
 
 const { root } = program.refs;
 
@@ -79,21 +81,6 @@ export async function init() {
     messages: {},
     labels: {},
   });
-
-  // TODO: Commenting this out until we can webpack the pubsub program correctly
-  // try {
-  //   await pubsub.createTopic({ name: TOPIC });
-  //   // TODO: use the IAM API to allow gmail to post to this topic
-  //
-  // } catch (err) {
-  //   // google-cloud errors have a status field that is more reliable than
-  //   // checking the message but it doesn't go through our message queue
-  //   if (!err.toString().indexOf('already exists')) {
-  //     throw err;
-  //   }
-  // }
-  //
-  // await pubsub.topic({name: 'gmail-driver-webhooks'}).messageReceived.subscribe('onWebhook');
 
   console.log('Please go to:', program.endpoints.auth.url);
   console.log('Redirect URL:', program.endpoints.redirect.url);
@@ -286,17 +273,33 @@ export async function endpoint({ name, req }) {
       auth.credentials = token;
       const profile = await getProfile({ userId: 'me', auth });
 
+      try {
+        await pubsub.createTopic({ name: TOPIC });
+        // TODO: use the IAM API to allow gmail to post to this topic
+
+      } catch (err) {
+        // google-cloud errors have a status field that is more reliable than
+        // checking the message but it doesn't go through our message queue
+        if (!err.toString().indexOf('already exists')) {
+          throw err;
+        }
+      }
+
+      const options = { pushEndpoint: program.endpoints.webhooks.url };
+      const name = pubsub.getSubscriptionName(TOPIC);
+      await client.subscribe(TOPIC, name, options);
+
       // Listen for changes in this user's inbox. This driver could start
       // watching when a subscription is made but it requires keeping track of a
       // lot of things so I'm skipping that for now.
-      // const response = await watch({
-      //   userId: profile.emailAddress,
-      //   auth,
-      //   resource: {
-      //     topicName: 'projects/modular-silicon-111805/topics/gmail-driver-webhooks', 
-      //   },
-      // });
-      // Object.assign(program.state, { token, historyId: response.historyId });
+      const response = await watch({
+        userId: profile.emailAddress,
+        auth,
+        resource: {
+          topicName: 'projects/modular-silicon-111805/topics/gmail-driver-webhooks',
+        },
+      });
+      Object.assign(program.state, { token, historyId: response.historyId });
 
       Object.assign(program.state, { token });
       await program.save();
@@ -340,8 +343,36 @@ export let MessageCollection = {
     auth.credentials = program.state.token;
     const { data } = await listMessage(options);
     return data;
+  },
+  async send({ args }) {
+    auth.credentials = program.state.token;
+    const { data } = await getProfile({ userId: "me", auth });
+    const { from, to, body, subject } = args;
+    const From = from ? from : data.emailAddress;
+
+    const base64EncodedEmail = btoa(
+      `Content-Type:  text/plain;
+      charset="UTF-8"\n
+      Content-length: 5000\n
+      Content-Transfer-Encoding: message/rfc2822\n
+      to: ${to}\n
+      from: ${from}\n
+      subject: ${subject}\n\n
+      ${body}`
+    )
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
+
+    const res = await sendMessage({
+      userId: "me",
+      auth,
+      resource: {
+        raw: base64EncodedEmail
+      }
+    });
+    return res.data;
   }
-}
+};
 
 export let MessagePage = {
   next({ self, source }) {

@@ -8,6 +8,10 @@
   {
    "name": "CLIENT_SECRET",
    "description": "The API client secret"
+  },
+  {
+   "name": "SERVICE_ACCOUNT_JSON",
+   "description": "The API Service Account key in JSON format. Get it at https://console.cloud.google.com/apis/credentials"
   }
  ],
  "endpoints": [
@@ -253,7 +257,34 @@
       ]
      }
     ],
-    "actions": [],
+    "actions": [
+     {
+      "name": "send",
+      "type": "Int",
+      "params": [
+       {
+        "name": "to",
+        "type": "String",
+        "description": "to email address of the receiver"
+       },
+       {
+        "name": "from",
+        "type": "String",
+        "description": "from email address of the sender, the mailbox account"
+       },
+       {
+        "name": "subject",
+        "type": "String",
+        "description": "subject of the email"
+       },
+       {
+        "name": "body",
+        "type": "String",
+        "description": "body text of the email"
+       }
+      ]
+     }
+    ],
     "events": []
    },
    {
