@@ -94,6 +94,7 @@ export async function init() {
 }
 
 export async function update({ previousVersion }) {
+  throw new Error('Fail update 1');
   console.log('updating Gmail Driver from previous version: ', previousVersion);
 }
 
