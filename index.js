@@ -93,7 +93,6 @@ export async function init() {
   console.log('Redirect URL:', program.endpoints.redirect.url);
 }
 
-throw new Error('Fail update 2');
 export async function update({ previousVersion }) {
   console.log('updating Gmail Driver from previous version: ', previousVersion);
 }
