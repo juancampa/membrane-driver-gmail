@@ -37,42 +37,50 @@ const TOPIC = 'gmail-driver-webhooks';
 // currently not doing
 // TODO: replace Batchelor with something that doesn't bring a millon
 // dependencies
-const messageLoader = new DataLoader(async (keys) => {
-  let batch;
-  try {
-    auth.credentials = program.state.token;
-    const { token } = await auth.getAccessToken();
-    batch = new Batchelor({
-      uri: 'https://www.googleapis.com/batch/gmail/v1',
-      // uri: 'http://localhost:8881/batch',
-      auth: { bearer: token },
-      headers: { 'Content-Type': 'multipart/mixed' }
-    });
-    console.log(`Batching ${keys.length} API calls`);
-    for (let key of keys) {
-      batch.add({
-        method: 'GET',
-        path: `/gmail/v1/users/me/messages/${key}`,
-        headers: { authorization: 'Bearer ' + token},
-      })
-    }
-  } catch (e) {
-    reject(e);
-  }
-  return new Promise((resolve, reject) => {
-    batch.run((err, response) => {
-      if (err) {
-        return reject(err);
+
+function createLoader(baseUrl) {
+  return new DataLoader(async (keys) => {
+    let batch;
+    try {
+      // Get a fresh access token using the auth library
+      auth.credentials = program.state.token;
+      const { token } = await auth.getAccessToken();
+
+      batch = new Batchelor({
+        uri: 'https://www.googleapis.com/batch/gmail/v1',
+        // uri: 'http://localhost:8881/batch',
+        auth: { bearer: token },
+        headers: { 'Content-Type': 'multipart/mixed' }
+      });
+      console.log(`Batching ${keys.length} API calls to ${baseUrl}`);
+      for (let key of keys) {
+        batch.add({
+          method: 'GET',
+          path: `${baseUrl}/${key}`,
+          headers: { authorization: 'Bearer ' + token},
+        })
       }
-      resolve(response.parts.map((part) => {
-        if (String(part.statusCode) !== '200') {
-          return new Error(part.statusMessage || `Response returned status ${part.statusCode}`)
+    } catch (e) {
+      reject(e);
+    }
+    return new Promise((resolve, reject) => {
+      batch.run((err, response) => {
+        if (err) {
+          return reject(err);
         }
-        return part.body
-      }));
+        resolve(response.parts.map((part) => {
+          if (String(part.statusCode) !== '200') {
+            return new Error(part.statusMessage || `Response returned status ${part.statusCode}`)
+          }
+          return part.body
+        }));
+      });
     });
   });
-});
+}
+
+const messageLoader = createLoader('/gmail/v1/users/me/messages');
+const threadLoader = createLoader('/gmail/v1/users/me/threads');
 
 export async function init() {
   await root.set({
@@ -311,13 +319,7 @@ export let Root = {
 
 export let MessageCollection = {
   async one({ args }) {
-    auth.credentials = program.state.token;
-    // Batched
     return messageLoader.load(args.id);
-
-    // Not batched:
-    // const { data: message } = await getMessage({ userId: 'me', auth, id: args.id });
-    // return message;
   },
 
   async page({ args }) {
@@ -465,8 +467,7 @@ export let Header = {
 
 export let ThreadCollection = {
   async one({ args }) {
-    auth.credentials = program.state.token;
-    const { data: thread } = await getThread({ userId: 'me', auth, id: args.id })
+    const thread = threadLoader.load(args.id);
 
     // Add some consistency by copying the snippet of the first message as the
     // snippet of the thread which is what threads.list seems to return.
