@@ -361,21 +361,22 @@ export let MessageCollection = {
       Content-length: 5000\n
       Content-Transfer-Encoding: message/rfc2822\n
     `
-    const encodedEmail = new Buffer(
-      `From: ${from}\n
+
+    const email = `From: ${from}\n
       To: ${to}\n
       Subject: ${subject}\n
       Date: ${Date().toString()}\n\n
-      ${body}`
-    ).toString('base64')
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_");
+      ${body}`;
+    console.log('Sending', email);
 
     const res = await sendMessage({
       userId: "me",
       auth,
       resource: {
-        raw: encodedEmail
+        raw: Buffer.from(email, 'utf8')
+              .toString('base64')
+              .replace(/\+/g, "-")
+              .replace(/\//g, "_")
       }
     });
     return res.data;
