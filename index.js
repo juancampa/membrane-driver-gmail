@@ -366,6 +366,7 @@ export let MessageCollection = {
       To: ${to}
       Subject: ${subject}
       Date: ${Date().toString()}
+      Message-ID: <1234@local.machine.example>
 
       ${body}`;
     console.log('Sending', email);
