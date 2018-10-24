@@ -21,6 +21,7 @@ const listHistory = promisify(gmail.users.history.list.bind(gmail.users.history)
 const messages = gmail.users.messages;
 const getMessage = promisify(messages.get.bind(messages));
 const listMessage = promisify(messages.list.bind(messages));
+const sendMessage = promisify(messages.send.bind(messages));
 
 const threads = gmail.users.threads;
 const getThread = promisify(threads.get.bind(threads));
