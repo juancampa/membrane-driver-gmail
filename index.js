@@ -362,13 +362,13 @@ export let MessageCollection = {
       Content-Transfer-Encoding: message/rfc2822\n
     `
 
-    const email = `To: ${to}
-      From: ${from}
-      Subject: ${subject}
-      Date: ${(new Date()).toUTCString()}
-      Message-ID: <1234@local.machine.example>
-
-      ${body}`;
+    const email =
+      `To: ${to}\r\n` +
+      `From: ${from}\r\n` +
+      `Subject: ${subject}\r\n` +
+      `Date: ${(new Date()).toUTCString()}\r\n` +
+      ` \r\n ` +
+      body;
     console.log('Sending', email);
 
     const res = await sendMessage({
