@@ -319,6 +319,36 @@ export async function endpoint({ name, req }) {
 }
 
 export let Root = {
+  async send({ args }) {
+    auth.credentials = program.state.token;
+    let { from, to, body, subject } = args;
+
+    // Default the from field to this user's email address
+    if (!from) {
+      const profile = await getProfile({ userId: "me", auth });
+      from = profile.data.email;
+    }
+
+    const email =
+      `To: ${to}\r\n` +
+      `From: ${from}\r\n` +
+      `Subject: ${subject}\r\n` +
+      `Date: ${(new Date()).toUTCString()}\r\n` +
+      ` \r\n ` +
+      body;
+
+    const res = await sendMessage({
+      userId: "me",
+      auth,
+      resource: {
+        raw: Buffer.from(email, 'utf8')
+              .toString('base64')
+              .replace(/\+/g, "-")
+              .replace(/\//g, "_")
+      }
+    });
+    return res.data;
+  }
 }
 
 export let MessageCollection = {
@@ -349,40 +379,6 @@ export let MessageCollection = {
     const { data } = await listMessage(options);
     return data;
   },
-  async send({ args }) {
-    auth.credentials = program.state.token;
-    const { data } = await getProfile({ userId: "me", auth });
-    const { from, to, body, subject } = args;
-    const From = from ? from : data.emailAddress;
-
-
-    const t = `
-      charset="UTF-8"\n
-      Content-length: 5000\n
-      Content-Transfer-Encoding: message/rfc2822\n
-    `
-
-    const email =
-      `To: ${to}\r\n` +
-      `From: ${from}\r\n` +
-      `Subject: ${subject}\r\n` +
-      `Date: ${(new Date()).toUTCString()}\r\n` +
-      ` \r\n ` +
-      body;
-    console.log('Sending', email);
-
-    const res = await sendMessage({
-      userId: "me",
-      auth,
-      resource: {
-        raw: Buffer.from(email, 'utf8')
-              .toString('base64')
-              .replace(/\+/g, "-")
-              .replace(/\//g, "_")
-      }
-    });
-    return res.data;
-  }
 };
 
 export let MessagePage = {
