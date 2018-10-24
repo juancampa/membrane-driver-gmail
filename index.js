@@ -256,7 +256,10 @@ export async function endpoint({ name, req }) {
         access_type: 'offline',
         prompt: 'consent',
         state: authState,
-        scope: ['https://www.googleapis.com/auth/gmail.readonly']
+        scope: [
+          'https://www.googleapis.com/auth/gmail.readonly',
+          'https://www.googleapis.com/auth/gmail.send'
+        ]
       });
 
       return {
