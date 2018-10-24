@@ -362,10 +362,11 @@ export let MessageCollection = {
       Content-Transfer-Encoding: message/rfc2822\n
     `
 
-    const email = `From: ${from}\n
-      To: ${to}\n
-      Subject: ${subject}\n
-      Date: ${Date().toString()}\n\n
+    const email = `From: ${from}
+      To: ${to}
+      Subject: ${subject}
+      Date: ${Date().toString()}
+
       ${body}`;
     console.log('Sending', email);
 
