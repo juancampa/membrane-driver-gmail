@@ -362,8 +362,8 @@ export let MessageCollection = {
       Content-Transfer-Encoding: message/rfc2822\n
     `
 
-    const email = `From: ${from}
-      To: ${to}
+    const email = `To: ${to}
+      From: ${from}
       Subject: ${subject}
       Date: ${(new Date()).toUTCString()}
       Message-ID: <1234@local.machine.example>
