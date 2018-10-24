@@ -355,14 +355,17 @@ export let MessageCollection = {
     const { from, to, body, subject } = args;
     const From = from ? from : data.emailAddress;
 
-    const base64EncodedEmail = new Buffer(
-      `Content-Type:  text/plain;
+
+    const t = `
       charset="UTF-8"\n
       Content-length: 5000\n
       Content-Transfer-Encoding: message/rfc2822\n
-      to: ${to}\n
-      from: ${from}\n
-      subject: ${subject}\n\n
+    `
+    const encodedEmail = new Buffer(
+      `From: ${from}\n
+      To: ${to}\n
+      Subject: ${subject}\n
+      Date: ${Date().toString()}\n\n
       ${body}`
     ).toString('base64')
       .replace(/\+/g, "-")
@@ -372,7 +375,7 @@ export let MessageCollection = {
       userId: "me",
       auth,
       resource: {
-        raw: base64EncodedEmail
+        raw: encodedEmail
       }
     });
     return res.data;
