@@ -365,7 +365,7 @@ export let MessageCollection = {
     const email = `From: ${from}
       To: ${to}
       Subject: ${subject}
-      Date: ${Date().toString()}
+      Date: ${(new Date()).toUTCString()}
       Message-ID: <1234@local.machine.example>
 
       ${body}`;
